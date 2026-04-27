@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Market | Auction</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-viewport {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 50%, #111115 0%, #09090b 100%);
+        }
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 48px;
+            background: var(--surface-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .auth-header .brand-identity {
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .auth-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-vivid);
+            letter-spacing: -0.02em;
+        }
+        .auth-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+        .auth-footer {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .auth-link {
+            color: var(--accent-emerald);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+        select.auction-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2001/XMLSchema' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+    </style>
+</head>
+<body class="auth-viewport">
+
+    <div class="auth-container">
+        <header class="auth-header">
+            <div class="brand-identity">
+                <img src="auction_logo.png" class="brand-icon" style="background:none; object-fit: cover;">
+                AUCTION
+            </div>
+            <h1 class="auth-title">Initialize Identity</h1>
+            <p class="auth-subtitle">Create your market profile to begin.</p>
+        </header>
+
+        <form id="registerForm">
+            <div class="input-group">
+                <label class="input-label">Full Name</label>
+                <input type="text" id="name" class="auction-input" placeholder="e.g. John Doe" required>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Email</label>
+                <input type="email" id="email" class="auction-input" placeholder="name@example.com" required>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">Password</label>
+                <input type="password" id="password" class="auction-input" placeholder="••••••••" required>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Market Role</label>
+                <select id="role" class="auction-input" required>
+                    <option value="BUYER">BUYER</option>
+                    <option value="SELLER">SELLER</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-action" style="height: 52px; background: var(--accent-emerald); color: #000; border: none; font-size: 14px; margin-top: 12px;">Join</button>
+        </form>
+
+        <footer class="auth-footer">
+            Already verified? <a href="login.html" class="auth-link">Secure Sign In</a>
+        </footer>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="js/app.js"></script>
+</body>
+</html>

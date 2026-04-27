@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Auction</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand-identity">
+                <img src="auction_logo.png" class="brand-icon" style="background:none; object-fit: cover;">
+                AUCTION ADMIN
+            </div>
+            <nav class="nav-links">
+                <button class="nav-item active" onclick="location.reload()">📊 Dashboard</button>
+                <button class="nav-item" onclick="window.location.href='home.html'">🏠 Back to Market</button>
+                <button class="nav-item" onclick="logout()">🚪 Sign Out</button>
+            </nav>
+        </aside>
+        <main class="main-viewport">
+            <h2 style="color: var(--text-vivid);">User Management</h2>
+            <div id="userList" class="bid-stream" style="margin-bottom: 40px; border-radius: 8px;"></div>
+
+            <h2 style="color: var(--text-vivid);">Active Auctions</h2>
+            <div id="adminProductList" class="bid-stream" style="border-radius: 8px;"></div>
+        </main>
+    </div>
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = getUser();
+            if (!user || user.role !== "ADMIN") window.location.href = "home.html";
+            loadAdminData();
+        });
+
+        async function loadAdminData() {
+            // Load Users
+            const users = await fetch(`${API_BASE}/admin/users`).then(r => r.json());
+            const userContainer = document.getElementById("userList");
+            userContainer.innerHTML = "";
+            users.forEach(u => {
+                const div = document.createElement("div");
+                div.className = "bid-item";
+                div.innerHTML = `<span>${u.name} (${u.email}) - ${u.role}</span>
+                                <button onclick="deleteUser(${u.id})" style="color: red; border:none; background:none; cursor:pointer;">Delete</button>`;
+                userContainer.appendChild(div);
+            });
+
+            // Load Products
+            const products = await fetch(`${PRODUCTS_URL}/all`).then(r => r.json());
+            const productContainer = document.getElementById("adminProductList");
+            productContainer.innerHTML = "";
+            products.forEach(p => {
+                const div = document.createElement("div");
+                div.className = "bid-item";
+                let imageUrl = p.imageUrls && p.imageUrls.length > 0 ? p.imageUrls[0] : 'assets/images/placeholder.jpg';
+                if (imageUrl.startsWith("/uploads")) imageUrl = API_BASE + imageUrl;
+                
+                div.innerHTML = `<div style="display:flex; align-items:center; gap:16px;">
+                                    <img src="${imageUrl}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; border:1px solid var(--border-subtle);" onerror="this.src='assets/images/placeholder.jpg'">
+                                    <span>${p.name} - Current Bid: ₹${p.currentHighestBid}</span>
+                                </div>
+                                <button onclick="deleteProduct(${p.id})" style="color: #ef4444; border:none; background:none; cursor:pointer; font-weight: 600;">Remove Listing</button>`;
+                productContainer.appendChild(div);
+            });
+        }
+
+        async function deleteUser(id) {
+            if (confirm("Delete this user?")) {
+                await fetch(`${API_BASE}/admin/users/${id}`, { method: 'DELETE' });
+                loadAdminData();
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (confirm("Remove this listing?")) {
+                await fetch(`${API_BASE}/admin/products/${id}`, { method: 'DELETE' });
+                loadAdminData();
+            }
+        }
+    </script>
+</body>
+</html>

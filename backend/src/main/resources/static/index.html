@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Auction</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+</head>
+<body>
+
+<h2>Live Bids</h2>
+
+<div id="bids"></div>
+
+<script>
+    let socket = new SockJS('http://localhost:8083/ws');
+    let stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function () {
+
+        console.log("Connected to WebSocket");
+
+        stompClient.subscribe('/topic/bids', function (message) {
+
+            let bid = JSON.parse(message.body);
+
+            document.getElementById("bids").innerHTML +=
+                "<p>New Bid: ₹" + bid.amount + "</p>";
+        });
+    });
+</script>
+
+</body>
+</html>

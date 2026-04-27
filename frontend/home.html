@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Auction</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- SockJS & Stomp -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand-identity">
+                <img src="auction_logo.png" class="brand-icon" style="background:none; object-fit: cover;">
+                AUCTION
+            </div>
+
+            <nav class="nav-links">
+                <button class="nav-item active" onclick="window.location.href='home.html'">
+                    <span>📊</span> Live Market
+                </button>
+                <button class="nav-item" id="myWinsLink">
+                    <span>🏆</span> My Winning Bids
+                </button>
+                <button class="nav-item" id="myAuctionsLink">
+                    <span>📦</span> My Listings
+                </button>
+                <div style="margin-top: 32px; padding: 0 18px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-weight: 600;">Account</div>
+                <button class="nav-item" onclick="logout()">
+                    <span>🚪</span> Sign Out
+                </button>
+            </nav>
+
+            <!-- User Info Slot -->
+            <div class="user-info-card">
+                <div id="userNameDisplay" style="font-size: 16px; font-weight: 600; color: var(--text-vivid);">Loading...</div>
+                <div style="font-size: 12px; color: var(--accent-emerald); margin-top: 6px; font-weight: 500; letter-spacing: 0.5px;">Verified Participant</div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-viewport">
+            
+            <!-- TOP STATS -->
+            <section class="market-stats">
+                <div class="stat-panel">
+                    <div class="stat-label">
+                        <span class="live-indicator"></span>Live Auctions
+                    </div>
+                    <div id="stat-total" class="stat-value">0</div>
+                </div>
+                <div class="stat-panel">
+                    <div class="stat-label">Your Active Wins</div>
+                    <div id="stat-wins" class="stat-value">0</div>
+                </div>
+                <div class="stat-panel">
+                    <div class="stat-label">Market Status</div>
+                    <div class="stat-value" style="color: var(--accent-emerald); font-size: 14px;">OPERATIONAL</div>
+                </div>
+            </section>
+
+            <!-- CREATE SECTION (Hidden for Buyers) -->
+            <section id="createSection" style="display: none; margin-bottom: 48px;">
+                <div class="stat-panel">
+                    <h2 style="font-size: 22px; color: var(--text-vivid); margin-bottom: 24px; font-weight: 600; letter-spacing: 0.5px;">List New Asset</h2>
+                    <div class="inline-form">
+                        <div class="input-group">
+                            <label class="input-label">Product Title</label>
+                            <input type="text" id="productName" class="auction-input" placeholder="e.g. Vintage Rolex Submariner">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Product Photo</label>
+                            <input type="file" id="productImage" class="auction-input" accept="image/*" style="padding: 11px 16px;">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Base Price (₹)</label>
+                            <input type="number" id="basePrice" class="auction-input" placeholder="0.00">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Category</label>
+                            <select id="productCategory" class="auction-input">
+                                <option value="Electronics">Electronics</option>
+                                <option value="Art">Art</option>
+                                <option value="Vehicles">Vehicles</option>
+                                <option value="Furniture">Furniture</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <button onclick="createProduct()" class="btn-action" style="height: 54px;">List Item</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEARCH & FILTER SECTION -->
+            <section class="filter-section">
+                <div class="filter-grid">
+                    <div class="input-group">
+                        <label class="input-label">Search Products</label>
+                        <input type="text" id="searchInput" class="auction-input" placeholder="Search by name..." oninput="applyFilters()">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Category</label>
+                        <select id="categoryFilter" class="auction-input" onchange="applyFilters()">
+                            <option value="All">All Categories</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Art">Art</option>
+                            <option value="Vehicles">Vehicles</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Min Price (₹)</label>
+                        <input type="number" id="minPriceFilter" class="auction-input" placeholder="0" oninput="applyFilters()">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Max Price (₹)</label>
+                        <input type="number" id="maxPriceFilter" class="auction-input" placeholder="Any" oninput="applyFilters()">
+                    </div>
+                </div>
+            </section>
+
+            <!-- ACTIVE MARKET GRID -->
+            <h2 style="font-size: 24px; color: var(--text-vivid); margin-bottom: 32px; letter-spacing: 0.5px; font-weight: 600;">Current Listings</h2>
+            <div id="productList" class="auction-grid">
+                <!-- Dynamic Content -->
+            </div>
+
+        </main>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
